@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Rumah Sakit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#41AAB5",
+              secondary: "#FBAD18",
+              "primary-dark": "#368C96",
+              "primary-light": "#5AC7D3",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .rotate-180 {
+        transform: rotate(180deg);
+      }
+      .transition-transform {
+        transition: transform 0.2s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="min-h-screen">
+      <!-- Sidebar -->
+      <div class="bg-primary text-white w-64 fixed h-full">
+        <div class="p-4 flex items-center">
+          <img
+            src="https://via.placeholder.com/40"
+            alt="Logo Rumah Sakit"
+            class="h-10 w-10 rounded-full mr-2"
+          />
+          <h1 class="text-xl font-bold">Rumah Sakit Sehat</h1>
+        </div>
+        <nav class="mt-6">
+          <div class="px-4 py-2 hover:bg-primary-dark cursor-pointer">
+            <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+          </div>
+
+          <!-- Menu Dokter dengan Dropdown -->
+          <div class="dropdown-menu">
+            <div
+              class="px-4 py-2 hover:bg-primary-dark cursor-pointer flex justify-between items-center dropdown-toggle"
+              onclick="OpenModalCreate()"
+            >
+              <div><i class="fas fa-user-md mr-2"></i> Dokter</div>
+              <i class="fas fa-chevron-down text-xs transition-transform"></i>
+            </div>
+            <div class="dropdown-content pl-8 hidden" id="dropdown-content">
+              <div class="px-4 py-2 hover:bg-primary-light cursor-pointer">
+                <i class="fas fa-stethoscope mr-2"></i> Spesialis
+              </div>
+              <div class="px-4 py-2 hover:bg-primary-light cursor-pointer">
+                <i class="fas fa-user-nurse mr-2"></i> Tenaga Medis
+              </div>
+              <div class="px-4 py-2 hover:bg-primary-light cursor-pointer">
+                <i class="fas fa-calendar-alt mr-2"></i> Jadwal
+              </div>
+              <div class="px-4 py-2 hover:bg-primary-light cursor-pointer">
+                <i class="fas fa-calendar-check mr-2"></i> Janji
+              </div>
+            </div>
+          </div>
+
+          <div class="px-4 py-2 hover:bg-primary-dark cursor-pointer">
+            <i class="fas fa-procedures mr-2"></i> Pasien
+          </div>
+          <div class="px-4 py-2 hover:bg-primary-dark cursor-pointer">
+            <i class="fas fa-pills mr-2"></i> Apoteker
+          </div>
+          <div class="px-4 py-2 hover:bg-primary-dark cursor-pointer">
+            <i class="fas fa-blog mr-2"></i> Blog
+          </div>
+        </nav>
+      </div>
+
+      <!-- Main Content -->
+      <div class="ml-64 p-8">
+        <div class="flex justify-between items-center mb-8">
+          <h2 class="text-2xl font-bold flex items-center">
+            <i class="fas fa-calendar-check mr-2 text-primary"></i> Manajemen Janji
+          </h2>
+          <button
+            id="openModalBtn"
+            class="bg-secondary hover:bg-yellow-500 text-white px-4 py-2 rounded-lg flex items-center"
+            onclick="ShowModalCreateAppointment()"
+          >
+            <i class="fas fa-plus mr-2"></i> Tambah Janji
+          </button>
+        </div>
+
+        <!-- Tabel Dokter -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <table class="min-w-full">
+            <thead class="bg-primary text-white">
+              <tr>
+                <th class="py-3 px-4 text-left">Pasien</th>
+                <th class="py-3 px-4 text-left">Dokter</th>
+                <th class="py-3 px-4 text-left">Tanggal</th>
+                <th class="py-3 px-4 text-left">Waktu</th>
+                <th class="py-3 px-4 text-left">Status</th>
+                <th class="py-3 px-4 text-left">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-gray-200 hover:bg-gray-50" data-id="1">
+                <td class="py-3 px-4">Dr. Andi Wijaya</td>
+                <td class="py-3 px-4">Kardiologi</td>
+                <td>12-05-2050</td>
+                <td>17:00</td>
+                <td>Pending</td>
+                <td class="py-3 px-4">
+                  <button class="text-blue-500 hover:text-blue-700 mr-2" onclick="UpdateAppointment(1)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="text-red-500 hover:text-red-700">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Tambah Dokter -->
+    <div
+      id="appointmentModalCreate"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 relative animate__animated animate__fadeInDown"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-primary flex items-center">
+           <i class="fas fa-calendar-check mr-2"></i>Tambah Janji Baru
+          </h3>
+          <button
+            id="closeModalBtnAppointment"
+            class="text-gray-400 hover:text-gray-600 text-lg"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Form -->
+      <form id="doctorForm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Nama Pasien</label
+              >
+              <input
+                type="text"
+                placeholder="Contoh: Dr. Siti Aminah"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Nama Dokter</label
+              >
+              <input
+                type="text"
+                placeholder="Contoh: Anak, Jantung"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Tanggal</label
+              >
+              <input
+                type="date"
+                placeholder="Contoh: Anak, Jantung"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Waktu</label
+              >
+              <input
+                type="time"
+                placeholder="Contoh: Anak, Jantung"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Status</label
+              >
+              <input
+                type="text"
+                placeholder="Contoh: Anak, Jantung"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          <!-- Tombol Simpan -->
+          <div class="mt-6 flex justify-end">
+            <button
+              type="button"
+              id="submitDoctorBtn"
+              class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg shadow-md"
+            >
+              <i class="fas fa-save mr-2"></i> Simpan Janji
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Modal Edit Appointment -->
+    <div
+      id="appointmentModalUpdate"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden"
+    >
+      <div
+        class="bg-white rounded-xl shadow-lg w-full max-w-2xl p-6 relative animate__animated animate__fadeInDown"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-primary flex items-center">
+           <i class="fas fa-calendar-check mr-2"></i>Ubah Janji Baru
+          </h3>
+          <button
+            id="closeModalBtnAppointmentUpdate"
+            class="text-gray-400 hover:text-gray-600 text-lg"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form id="doctorForm">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Nama Pasien</label
+              >
+              <input
+                type="text"
+                placeholder="Contoh: Dr. Siti Aminah"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Nama Dokter</label
+              >
+              <input
+                type="text"
+                placeholder="Contoh: Anak, Jantung"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Tanggal</label
+              >
+              <input
+                type="date"
+                placeholder="Contoh: Anak, Jantung"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Waktu</label
+              >
+              <input
+                type="time"
+                placeholder="Contoh: Anak, Jantung"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Status</label
+              >
+              <input
+                type="text"
+                placeholder="Contoh: Anak, Jantung"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          <!-- Tombol Simpan -->
+          <div class="mt-6 flex justify-end">
+            <button
+              type="button"
+              id="submitDoctorBtn"
+              class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg shadow-md"
+            >
+              <i class="fas fa-save mr-2"></i> Simpan Janji
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="index.js"></script>
+    <script src="janji.js"></script>
+    
+  </body>
+</html>
